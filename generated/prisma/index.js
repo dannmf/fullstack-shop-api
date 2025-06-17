@@ -138,7 +138,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\www\\node\\api-cadastro\\generated\\prisma",
+      "value": "C:\\www\\node\\fullstack-shop-api\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -152,11 +152,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\www\\node\\api-cadastro\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\www\\node\\fullstack-shop-api\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
+    "rootEnvPath": "../../.env",
     "schemaEnvPath": "../../.env"
   },
   "relativePath": "../../prisma",
@@ -166,11 +166,12 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "file:./dev.db"
+        "value": null
       }
     }
   },
