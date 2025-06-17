@@ -1,14 +1,30 @@
 import { FastifyInstance } from "fastify";
 import { categoryController } from "../controllers/category_controller";
+import { authenticate } from "../middlewares/authenticate";
 
 export async function categoryRoutes(fastify: FastifyInstance) {
-    fastify.post('/category', categoryController.create)
+    fastify.post('/category', {
+        preHandler: authenticate,
+        handler: categoryController.create
+    })
 
-    fastify.get('/category', categoryController.findAll)
+    fastify.get('/category', {
+        preHandler: authenticate,
+        handler: categoryController.findAll
+    })
 
-    fastify.get('/category/:id', categoryController.findById)
+    fastify.get('/category/:id', {
+        preHandler: authenticate,
+        handler: categoryController.findById
+    })
 
-    fastify.put('/category/:id', categoryController.update)
+    fastify.put('/category/:id', {
+        preHandler: authenticate,
+        handler: categoryController.update
+    })
 
-    fastify.delete('/category/:id', categoryController.delete)
+    fastify.delete('/category/:id', {
+        preHandler: authenticate,
+        handler: categoryController.delete
+    })
 }

@@ -19,14 +19,6 @@ app.register(userRoutes);
 app.register(productRoutes);
 app.register(categoryRoutes);
 
-app.addHook('onRequest', async (request, reply) => {
-    if(request.url !== '/login'){
-        await authenticate(request,reply)
-    }
-})
-
-
-
 const start = async () => {
     try {
         await app.listen({ port: 3333, host: '0.0.0.0' })
