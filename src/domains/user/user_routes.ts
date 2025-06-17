@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { usersController } from '../controllers/user_controller'
-import { authenticate } from '../middlewares/authenticate'
+import { usersController } from './user_controller'
+import { authenticate } from '../../shared/middlewares/authenticate'
 
 export async function userRoutes(fastify: FastifyInstance) {
 

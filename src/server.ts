@@ -1,10 +1,10 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
-import { userRoutes } from './routes/users_routes';
-import { productRoutes } from './routes/product_routes';
-import { categoryRoutes } from './routes/category_routes';
-import { authRoutes } from './routes/auth_routes';
-import { authenticate } from './middlewares/authenticate';
+import { userRoutes } from './domains/user/user_routes';
+import { productRoutes } from './domains/product/product_routes';
+import { authenticate } from './shared/middlewares/authenticate';
+import { authRoutes } from './domains/auth/auth_routes';
+import { categoryRoutes } from './domains/category/category_routes';
 
 const app = Fastify({ logger: true })
 

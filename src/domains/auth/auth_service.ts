@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
-import { prisma } from '../lib/prisma'
-import { signToken } from '../lib/jwt'
+import { prisma } from '../../shared/lib/prisma'
+import { signToken } from '../../shared/lib/jwt'
 
 export class AuthService {
   async login(data: { email: string, password: string }) {

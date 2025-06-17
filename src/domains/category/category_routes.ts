@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { categoryController } from "../controllers/category_controller";
-import { authenticate } from "../middlewares/authenticate";
+import { authenticate } from "../../shared/middlewares/authenticate";
+import { categoryController } from "./category_controller";
 
 export async function categoryRoutes(fastify: FastifyInstance) {
     fastify.post('/category', {

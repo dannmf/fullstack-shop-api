@@ -1,5 +1,5 @@
-import { ProductDto } from "../dto/product_dto";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../shared/lib/prisma";
+import { ProductDto } from "./product_dto";
 
 export class ProductsService {
     async createProduct(data: {

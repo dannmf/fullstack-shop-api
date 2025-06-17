@@ -1,7 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { ProductsService } from "../services/product_service";
 import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../lib/prisma";
+import { ProductsService } from "./product_service";
 
 const productService = new ProductsService()
 

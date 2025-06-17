@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../shared/lib/prisma";
 
 export class CategoryService {
     async createCategory(data: {

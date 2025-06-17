@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { productController } from "../controllers/product_controller";
-import { authenticate } from "../middlewares/authenticate";
+import { authenticate } from "../../shared/middlewares/authenticate";
+import { productController } from "./product_controller";
 
 export async function productRoutes(fastify: FastifyInstance) {
     fastify.post('/product', {
