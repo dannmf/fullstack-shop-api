@@ -1,35 +1,23 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { UsersService } from './user_service'
+import { createUserBodySchema, CreateUserBodySchema, paramsWithIdSchema, ParamsWithIdSchema, updateUserBodySchema, UpdateUserBodySchema } from './user_schema'
 const usersService = new UsersService()
 
-interface ParamsWithId {
-  id: string
-}
-
-interface CreateUserBody {
-  name: string,
-  email: string,
-  password: string,
-  birthDate: Date
-}
-
-interface UpdateUserBody {
-  name?: string,
-  email?: string,
-  password?: string,
-  birthDate?: Date
-}
-
-
 export const usersController = {
-  async create(request: FastifyRequest<{Body: CreateUserBody}>, reply: FastifyReply) {
+  async create(request: FastifyRequest<{ Body: CreateUserBodySchema }>, reply: FastifyReply) {
     try {
-      const { name, email, password, birthDate } = request.body 
+      const result = createUserBodySchema.safeParse(request.body)
+      if (!result.success) {
+        return reply.status(400).send({
+          message: 'Dados inválidos',
+          errors: result.error
+        })
+      }
       const user = await usersService.createUser({
-        name,
-        email,
-        password,
-        birthDate: new Date(birthDate)
+        name: result.data.name,
+        email: result.data.email,
+        password: result.data.password,
+        birthDate: result.data.birthDate
       })
 
       return reply.status(201).send(user)
@@ -51,14 +39,16 @@ export const usersController = {
     }
   },
 
-  async findById(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+  async findById(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
     try {
-      const { id } = request.params
-      const userId = parseInt(id, 10)
-
-      if (isNaN(userId)) {
-        return reply.status(400).send({ message: 'ID inválido' })
+      const result = paramsWithIdSchema.safeParse(request.params)
+      if (!result.success) {
+        return reply.status(400).send({
+          message: 'ID inválido',
+          errors: result.error
+        })
       }
+      const userId = result.data.id
 
       const user = await usersService.findById(userId)
       return reply.send(user)
@@ -72,25 +62,32 @@ export const usersController = {
   },
 
 
-  async update(request: FastifyRequest<{ Params: ParamsWithId, Body: UpdateUserBody }>, reply: FastifyReply) {
+  async update(request: FastifyRequest<{ Params: ParamsWithIdSchema, Body: UpdateUserBodySchema }>, reply: FastifyReply) {
     try {
-      const { id } = request.params
-      const userId = parseInt(id, 10)
-      const data = request.body 
-
-      if (isNaN(userId)) {
-        return reply.status(400).send({ message: 'ID inválido' })
+      const resultParams = paramsWithIdSchema.safeParse(request.params)
+      if (!resultParams.success) {
+        return reply.status(400).send({
+          message: 'ID inválido',
+          errors: resultParams.error
+        })
       }
 
-      const user = await usersService.update(userId, {
-        name: data.name,
-        email: data.email,
-        birthDate: data.birthDate ? new Date(data.birthDate) : undefined
+      const resultBody = updateUserBodySchema.safeParse(request.body)
+      if (!resultBody.success) {
+        return reply.status(400).send({
+          message: 'Dados inválidos',
+          errors: resultBody.error
+        })
+      }
+
+
+
+      const user = await usersService.update(resultParams.data.id, {
+        name: resultBody.data.name,
+        email: resultBody.data.email,
+        birthDate: resultBody.data.birthDate
       })
 
-      if (data.password && data.password.trim() !== '') {
-        user['password'] = data.password
-      }
 
       return reply.send(user)
     } catch (error) {
@@ -99,15 +96,17 @@ export const usersController = {
   },
 
 
-  async delete(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+  async delete(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
     try {
-      const { id } = request.params
-      const userId = parseInt(id, 10)
-
-      if (isNaN(userId)) {
-        return reply.status(400).send({ message: 'ID inválido' })
+      const result = paramsWithIdSchema.safeParse(request.params)
+      if (!result.success) {
+        return reply.status(400).send({
+          message: 'ID inválido',
+          errors: result.error
+        })
       }
-
+      const userId = result.data.id
+      
       await usersService.delete(userId)
       return reply.status(204).send()
     } catch (error) {
