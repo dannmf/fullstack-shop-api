@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { UsersService } from './user_service'
 import { createUserBodySchema, CreateUserBodySchema, paramsWithIdSchema, ParamsWithIdSchema, updateUserBodySchema, UpdateUserBodySchema } from './user_schema'
+import { formatError } from '../../shared/utils/error/zod_error'
 const usersService = new UsersService()
 
 export const usersController = {
@@ -10,7 +11,7 @@ export const usersController = {
       if (!result.success) {
         return reply.status(400).send({
           message: 'Dados inválidos',
-          errors: result.error
+          errors: formatError(result)
         })
       }
       const user = await usersService.createUser({
@@ -45,7 +46,8 @@ export const usersController = {
       if (!result.success) {
         return reply.status(400).send({
           message: 'ID inválido',
-          errors: result.error
+          errors: formatError(result)
+
         })
       }
       const userId = result.data.id
@@ -68,7 +70,8 @@ export const usersController = {
       if (!resultParams.success) {
         return reply.status(400).send({
           message: 'ID inválido',
-          errors: resultParams.error
+          errors: formatError(resultParams)
+
         })
       }
 
@@ -76,7 +79,8 @@ export const usersController = {
       if (!resultBody.success) {
         return reply.status(400).send({
           message: 'Dados inválidos',
-          errors: resultBody.error
+          errors: formatError(resultBody)
+
         })
       }
 
@@ -102,11 +106,12 @@ export const usersController = {
       if (!result.success) {
         return reply.status(400).send({
           message: 'ID inválido',
-          errors: result.error
+          errors: formatError(result)
+
         })
       }
       const userId = result.data.id
-      
+
       await usersService.delete(userId)
       return reply.status(204).send()
     } catch (error) {
