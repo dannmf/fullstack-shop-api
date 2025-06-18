@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AuthService } from "./auth_service";
 import { authBodySchema, LoginBody } from "./auth_schema";
+import { formatError } from "../../shared/utils/error/zod_error";
 
 const authService = new AuthService()
 
@@ -12,7 +13,8 @@ export const authController = {
             if (!result.success) {
                 return reply.status(400).send({
                     message: 'Dados inválidos',
-                    errors: result.error
+                    errors: formatError(result)
+
                 });
             }
 
