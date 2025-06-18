@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { CategoryService } from "./category_service";
 import { createCategoryBodySchema, CreateCategoryBodySchema, paramsWithIdSchema, ParamsWithIdSchema, UpdateCategoryBodySchema } from "./category_schema";
+import { formatError } from "../../shared/utils/error/zod_error";
 
 const categoryService = new CategoryService()
 
@@ -11,7 +12,8 @@ export const categoryController = {
             if (!result.success) {
                 return reply.status(400).send({
                     message: 'Dados inválidos',
-                    errors: result.error
+                    errors: formatError(result)
+
                 })
             }
             const { name } = result.data;
@@ -45,7 +47,8 @@ export const categoryController = {
             if (!paramsResult.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: paramsResult.error
+                    errors: formatError(paramsResult)
+
                 })
             }
 
@@ -65,7 +68,8 @@ export const categoryController = {
             if (!paramsResult.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: paramsResult.error
+                    errors: formatError(paramsResult)
+
                 })
             }
 
@@ -74,7 +78,8 @@ export const categoryController = {
             if (!bodyResult.success) {
                 return reply.status(400).send({
                     message: 'Dados inválidos',
-                    errors: bodyResult.error
+                    errors: formatError(bodyResult)
+
                 })
             }
 
@@ -96,7 +101,8 @@ export const categoryController = {
             if (!paramsResult.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: paramsResult.error
+                    errors: formatError(paramsResult)
+
                 })
             }
             const categoryId = paramsResult.data.id;
