@@ -3,6 +3,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { ProductsService } from "./product_service";
 import { createProductBodySchema, CreateProductBodySchema, ParamsWithIdSchema, updateProductBodySchema, UpdateProductBodySchema } from "./product_schema";
 import { paramsWithIdSchema } from "../category/category_schema";
+import { formatError } from "../../shared/utils/error/zod_error";
 
 const productService = new ProductsService()
 
@@ -13,7 +14,8 @@ export const productController = {
             if (!result.success) {
                 return reply.status(400).send({
                     message: 'Dados inválidos',
-                    errors: result.error
+                    errors: formatError(result)
+
                 })
             }
             const product = result.data
@@ -45,7 +47,8 @@ export const productController = {
             if (!result.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: result.error
+                    errors: formatError(result)
+
                 })
             }
 
@@ -87,7 +90,8 @@ export const productController = {
             if (!paramsResult.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: paramsResult.error
+                    errors: formatError(paramsResult)
+
                 })
             }
             const productId = paramsResult.data.id
@@ -96,7 +100,8 @@ export const productController = {
             if (!bodyResult.success) {
                 return reply.status(400).send({
                     message: 'Dados inválidos',
-                    errors: bodyResult.error
+                    errors: formatError(bodyResult)
+
                 })
             }
 
@@ -122,7 +127,8 @@ export const productController = {
             if (!result.success) {
                 return reply.status(400).send({
                     message: 'ID inválido',
-                    errors: result.error
+                    errors: formatError(result)
+
                 })
             }
 
