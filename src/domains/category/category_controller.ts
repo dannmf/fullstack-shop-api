@@ -1,24 +1,21 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { CategoryService } from "./category_service";
+import { createCategoryBodySchema, CreateCategoryBodySchema, paramsWithIdSchema, ParamsWithIdSchema, UpdateCategoryBodySchema } from "./category_schema";
 
 const categoryService = new CategoryService()
 
-interface ParamsWithId {
-    id: string
-}
-
-interface CreateCategoryBody {
-    name: string
-}
-
-interface UpdateCategoryBody {
-    name: string
-}
-
 export const categoryController = {
-    async create(request: FastifyRequest<{ Body: CreateCategoryBody }>, reply: FastifyReply) {
+    async create(request: FastifyRequest<{ Body: CreateCategoryBodySchema }>, reply: FastifyReply) {
         try {
-            const { name } = request.body
+            const result = createCategoryBodySchema.safeParse(request.body);
+            if (!result.success) {
+                return reply.status(400).send({
+                    message: 'Dados inválidos',
+                    errors: result.error
+                })
+            }
+            const { name } = result.data;
+
             const category = await categoryService.createCategory({
                 name
             })
@@ -41,13 +38,18 @@ export const categoryController = {
         }
     },
 
-    async findById(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+    async findById(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const categoryId = parseInt(id, 10)
-            if (isNaN(categoryId)) {
-                return reply.status(400).send({ message: 'ID inválido' })
+
+            const paramsResult = paramsWithIdSchema.safeParse(request.params);
+            if (!paramsResult.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: paramsResult.error
+                })
             }
+
+            const categoryId = paramsResult.data.id;
             const category = await categoryService.findById(categoryId)
             return reply.send(category)
         } catch (error: any) {
@@ -57,14 +59,27 @@ export const categoryController = {
             return reply.status(500).send({ message: 'Erro interno do servidor' })
         }
     },
-    async update(request: FastifyRequest<{ Params: ParamsWithId, Body: UpdateCategoryBody }>, reply: FastifyReply) {
+    async update(request: FastifyRequest<{ Params: ParamsWithIdSchema, Body: UpdateCategoryBodySchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const categoryId = parseInt(id, 10)
-            const data = request.body
-            if (isNaN(categoryId)) {
-                return reply.status(400).send({ message: 'ID inválido' })
+            const paramsResult = paramsWithIdSchema.safeParse(request.params);
+            if (!paramsResult.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: paramsResult.error
+                })
             }
+
+
+            const bodyResult = createCategoryBodySchema.safeParse(request.body);
+            if (!bodyResult.success) {
+                return reply.status(400).send({
+                    message: 'Dados inválidos',
+                    errors: bodyResult.error
+                })
+            }
+
+            const categoryId = paramsResult.data.id;
+            const data = bodyResult.data;
             const category = await categoryService.update(categoryId, data)
             return reply.send(category)
         } catch (error: any) {
@@ -75,24 +90,26 @@ export const categoryController = {
         }
     },
 
-    async delete(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+    async delete(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const categoryId = parseInt(id, 10)
-
-            if (isNaN(categoryId)) {
-                return reply.status(400).send({ message: 'ID inválido' })
+            const paramsResult = paramsWithIdSchema.safeParse(request.params);
+            if (!paramsResult.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: paramsResult.error
+                })
             }
+            const categoryId = paramsResult.data.id;
 
             await categoryService.delete(categoryId)
             return reply.status(204).send()
-        } catch(error: any) {
+        } catch (error: any) {
             if (error.message === 'Categoria não encontrada') {
                 return reply.status(404).send({ message: error.message })
             }
             return reply.status(500).send({ message: 'Erro interno do servidor' })
-        }   
-        
+        }
+
     }
 
 }
