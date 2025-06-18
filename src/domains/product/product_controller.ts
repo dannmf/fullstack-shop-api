@@ -1,44 +1,22 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { ProductsService } from "./product_service";
+import { createProductBodySchema, CreateProductBodySchema, ParamsWithIdSchema, updateProductBodySchema, UpdateProductBodySchema } from "./product_schema";
+import { paramsWithIdSchema } from "../category/category_schema";
 
 const productService = new ProductsService()
 
-interface ParamsWithId {
-    id: string
-}
-
-interface CreateProductBody {
-    name: string
-    description: string
-    price: number
-    stock: number
-    categoryId: number
-    imageUrl: string
-
-}
-
-interface UpdateProductBody {
-    name?: string
-    description?: string
-    price?: number
-    stock?: number
-    categoryId?: number
-    imageUrl?: string
-
-}
 export const productController = {
-    async create(request: FastifyRequest<{ Body: CreateProductBody }>, reply: FastifyReply) {
+    async create(request: FastifyRequest<{ Body: CreateProductBodySchema }>, reply: FastifyReply) {
         try {
-            const { name, description, price, stock, categoryId, imageUrl } = request.body
-            const product = await productService.createProduct({
-                name,
-                description,
-                price: Number(price),
-                stock: Number(stock),
-                categoryId: Number(categoryId),
-                imageUrl
-            })
+            const result = createProductBodySchema.safeParse(request.body);
+            if (!result.success) {
+                return reply.status(400).send({
+                    message: 'Dados inválidos',
+                    errors: result.error
+                })
+            }
+            const product = result.data
             return reply.status(201).send(product)
         } catch (error: any) {
             console.error('Erro ao criar produto:', error)
@@ -61,14 +39,17 @@ export const productController = {
         }
     },
 
-    async findById(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+    async findById(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const productId = parseInt(id, 10)
-
-            if (isNaN(productId)) {
-                return reply.status(400).send({ message: 'ID Inválido' })
+            const result = paramsWithIdSchema.safeParse(request.params);
+            if (!result.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: result.error
+                })
             }
+
+            const productId = result.data.id;
 
             const product = await productService.findById(productId)
             return reply.send(product)
@@ -92,7 +73,7 @@ export const productController = {
     },
 
     async lowStockProducts(request: FastifyRequest, reply: FastifyReply) {
-        try { 
+        try {
             const products = await productService.lowStockProducts()
             return reply.send(products)
         } catch (error: any) {
@@ -100,23 +81,32 @@ export const productController = {
         }
     },
 
-    async update(request: FastifyRequest<{ Params: ParamsWithId, Body: UpdateProductBody }>, reply: FastifyReply) {
+    async update(request: FastifyRequest<{ Params: ParamsWithIdSchema, Body: UpdateProductBodySchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const productId = parseInt(id, 10)
-            const data = request.body
+            const paramsResult = paramsWithIdSchema.safeParse(request.params)
+            if (!paramsResult.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: paramsResult.error
+                })
+            }
+            const productId = paramsResult.data.id
 
-            if (isNaN(productId)) {
-                return reply.status(400).send({ message: 'ID Inválido' })
+            const bodyResult = updateProductBodySchema.safeParse(request.body)
+            if (!bodyResult.success) {
+                return reply.status(400).send({
+                    message: 'Dados inválidos',
+                    errors: bodyResult.error
+                })
             }
 
             const product = await productService.update(productId, {
-                name: data.name,
-                description: data.description,
-                price: Number(data.price),
-                stock: Number(data.stock),
-                categoryId: Number(data.categoryId),
-                imageUrl: data.imageUrl,
+                name: bodyResult.data.name,
+                description: bodyResult.data.description,
+                price: bodyResult.data.price,
+                stock: bodyResult.data.stock,
+                categoryId: bodyResult.data.categoryId,
+                imageUrl: bodyResult.data.imageUrl,
             })
 
             return reply.send(product)
@@ -126,14 +116,17 @@ export const productController = {
         }
     },
 
-    async delete(request: FastifyRequest<{ Params: ParamsWithId }>, reply: FastifyReply) {
+    async delete(request: FastifyRequest<{ Params: ParamsWithIdSchema }>, reply: FastifyReply) {
         try {
-            const { id } = request.params
-            const productId = parseInt(id, 10)
-
-            if (isNaN(productId)) {
-                return reply.status(400).send({ message: 'ID inválido' })
+            const result = paramsWithIdSchema.safeParse(request.params);
+            if (!result.success) {
+                return reply.status(400).send({
+                    message: 'ID inválido',
+                    errors: result.error
+                })
             }
+
+            const productId = result.data.id;
 
             await productService.delete(productId)
             return reply.status(204).send()
